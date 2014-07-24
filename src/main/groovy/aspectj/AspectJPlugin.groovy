@@ -44,37 +44,36 @@ class AspectJPlugin implements Plugin<Project> {
             }
         }
 
-        if (!project.sourceSets.main.allJava.isEmpty()) {
-            project.tasks.create(name: 'compileAspect', overwrite: true, description: 'Compiles AspectJ Source', type: Ajc) {
-                sourceSet = project.sourceSets.main
 
-                inputs.files(sourceSet.allJava)
-                outputs.dir(sourceSet.output.classesDir)
-                aspectPath = project.configurations.aspectpath
-                ajInpath = project.configurations.ajInpath
-            }
+        project.tasks.create(name: 'compileAspect', overwrite: true, description: 'Compiles AspectJ Source', type: Ajc) {
+            sourceSet = project.sourceSets.main
 
-            project.tasks.compileAspect.setDependsOn(project.tasks.compileJava.dependsOn)
-
-            project.tasks.compileJava.deleteAllActions()
-            project.tasks.compileJava.dependsOn project.tasks.compileAspect
+            inputs.files(sourceSet.allJava)
+            outputs.dir(sourceSet.output.classesDir)
+            aspectPath = project.configurations.aspectpath
+            ajInpath = project.configurations.ajInpath
         }
 
-        if (!project.sourceSets.test.allJava.isEmpty()) {
-            project.tasks.create(name: 'compileTestAspect', overwrite: true, description: 'Compiles AspectJ Test Source', type: Ajc) {
-                sourceSet = project.sourceSets.test
+        project.tasks.compileAspect.setDependsOn(project.tasks.compileJava.dependsOn)
 
-                inputs.files(sourceSet.allJava)
-                outputs.dir(sourceSet.output.classesDir)
-                aspectPath = project.configurations.testAspectpath
-                ajInpath = project.configurations.testAjInpath
-            }
+        project.tasks.compileJava.deleteAllActions()
+        project.tasks.compileJava.dependsOn project.tasks.compileAspect
 
-            project.tasks.compileTestAspect.setDependsOn(project.tasks.compileTestJava.dependsOn)
 
-            project.tasks.compileTestJava.deleteAllActions()
-            project.tasks.compileTestJava.dependsOn project.tasks.compileTestAspect
+        project.tasks.create(name: 'compileTestAspect', overwrite: true, description: 'Compiles AspectJ Test Source', type: Ajc) {
+            sourceSet = project.sourceSets.test
+
+            inputs.files(sourceSet.allJava)
+            outputs.dir(sourceSet.output.classesDir)
+            aspectPath = project.configurations.testAspectpath
+            ajInpath = project.configurations.testAjInpath
         }
+
+        project.tasks.compileTestAspect.setDependsOn(project.tasks.compileTestJava.dependsOn)
+
+        project.tasks.compileTestJava.deleteAllActions()
+        project.tasks.compileTestJava.dependsOn project.tasks.compileTestAspect
+
     }
 }
 
